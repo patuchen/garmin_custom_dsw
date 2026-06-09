@@ -1,0 +1,4 @@
+<properties>
+    <property id="psk" type="string">super_secure_preshared_key_12345</property>
+    <property id="serverUrl" type="string">https://127.0.0.1:8080/sync</property>
+</properties>

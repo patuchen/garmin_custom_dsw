@@ -1,0 +1,8 @@
+<settings>
+    <setting propertyKey="@Properties.psk" title="Preshared Key (HMAC PSK)">
+        <settingConfig type="alphaNumeric"/>
+    </setting>
+    <setting propertyKey="@Properties.serverUrl" title="Flask Local Server URL">
+        <settingConfig type="alphaNumeric"/>
+    </setting>
+</settings>

@@ -1,0 +1,30 @@
+user_profile:
+  birth_year: 1990
+  gender: "female"
+  max_hr: 185
+  resting_hr: 52
+  vdot_race_distance_m: 5000
+  vdot_race_time_sec: 1500  # Used to calculate Daniels VDOT reference paces
+
+training_goal:
+  target_event: "improving_fitness"  # "improving_fitness", "maintenance", or "half_marathon"
+  target_date: "2026-10-15"
+  weekly_mileage_cap_km: 40
+  weekday_soft_limit_mins: 60
+  weekend_soft_limit_mins: 120
+  intensity_anchor: "heart_rate"  # "heart_rate" or "pace"
+  minimum_run_length_km: 2.0     # Default run length limit
+  minimum_run_duration_mins: 15.0 # Custom run duration limit (optional, if recommendation is shorter we suggest Brisk Walk)
+
+periodization_parameters:
+  base_phase_weeks: 4
+  build_phase_weeks: 5
+  peak_phase_weeks: 2
+  taper_phase_weeks: 1
+
+automation_settings:
+  wake_window_start_hour: 6
+  wake_window_start_minute: 30
+  wake_window_end_hour: 9
+  wake_window_end_minute: 30
+  shared_psk: "super_secure_preshared_key_12345"  # Used to authenticate loopback requests

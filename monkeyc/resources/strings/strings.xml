@@ -1,0 +1,6 @@
+<strings>
+    <string id="AppName">Dynamic Training Plan</string>
+    <string id="GlanceLabel">Training Plan</string>
+    <string id="SyncSuccess">Sync Complete</string>
+    <string id="SyncFailed">Sync Failed</string>
+</strings>

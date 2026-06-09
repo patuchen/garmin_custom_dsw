@@ -1,0 +1,21 @@
+# Garmin credentials (DO NOT COMMIT!)
+phone/scripts/secrets.yaml
+phone/scripts/cert.pem
+phone/scripts/key.pem
+
+# Python cache & build files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Local cache files
+.garminconnect/
+.garmin_daily_lock
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

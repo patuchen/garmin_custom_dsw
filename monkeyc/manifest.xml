@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<iq:manifest xmlns:iq="http://www.garmin.com/monkeyc/ns/manifest" entry="DynamicPlanApp" id="a5c3d2e1-4b1d-4f2e-8cd5-e0b850dda49f" type="widget" version="1.0.0">
+    <iq:application>
+        <iq:products>
+            <iq:product id="venu3s"/>
+        </iq:products>
+        <iq:permissions>
+            <iq:uses-permission id="Communications"/>
+            <iq:uses-permission id="UserProfile"/>
+            <iq:uses-permission id="SensorHistory"/>
+        </iq:permissions>
+        <iq:languages/>
+        <iq:barrels/>
+    </iq:application>
+</iq:manifest>
