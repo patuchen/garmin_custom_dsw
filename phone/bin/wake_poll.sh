@@ -53,7 +53,11 @@ from garminconnect import Garmin
 
 try:
     config = load_config()
-    client = Garmin(config['garmin_email'], config['garmin_password'])
+    client = Garmin(
+        email=config['garmin_email'],
+        password=config['garmin_password'],
+        prompt_mfa=lambda: ''
+    )
     client.login(os.path.expanduser('~/.garminconnect'))
     
     sleep = client.get_sleep_data(datetime.date.today().isoformat())

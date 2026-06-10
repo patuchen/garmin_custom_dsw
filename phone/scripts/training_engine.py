@@ -434,7 +434,11 @@ def run_physiological_training_engine():
     config = load_config()
     
     # 1. Log in to Garmin
-    client = Garmin(config["garmin_email"], config["garmin_password"])
+    client = Garmin(
+        email=config["garmin_email"], 
+        password=config["garmin_password"],
+        prompt_mfa=lambda: input("Enter MFA code: ").strip()
+    )
     token_dir = os.path.expanduser("~/.garminconnect")
     client.login(token_dir)
     
