@@ -69,9 +69,14 @@ def sync_handler():
         }), 200
         
     except Exception as e:
+        err_msg = str(e)
+        print(f"ERROR: Sync failed: {err_msg}")
+        if "Authentication" in err_msg or "login" in err_msg.lower():
+            print("TIP: Your Garmin session may have expired. Please run the interactive login to renew:")
+            print("     python3 ~/scripts/training_engine.py --interactive")
         return jsonify({
             "status": "error",
-            "message": str(e)
+            "message": err_msg
         }), 500
 
 if __name__ == '__main__':

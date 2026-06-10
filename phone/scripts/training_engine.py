@@ -430,15 +430,32 @@ def build_garmin_workout(plan, intensity_anchor):
     }
 
 # Sync and publish to Garmin Connect
-def run_physiological_training_engine():
+def run_physiological_training_engine(interactive=False):
+    import getpass
     config = load_config()
     
     # 1. Log in to Garmin
-    client = Garmin(
-        email=config["garmin_email"], 
-        password=config["garmin_password"],
-        prompt_mfa=lambda: input("Enter MFA code: ").strip()
-    )
+    email = config.get("garmin_email")
+    password = config.get("garmin_password")
+    
+    if interactive:
+        if not email or email == "your_email@example.com":
+            email = input("Enter Garmin Connect Email: ").strip()
+        if not password or password == "your_garmin_password_here":
+            password = getpass.getpass("Enter Garmin Connect Password: ").strip()
+            
+        client = Garmin(
+            email=email, 
+            password=password,
+            prompt_mfa=lambda: input("Enter MFA code: ").strip()
+        )
+    else:
+        # Non-interactive mode: only use email and cached tokens
+        client = Garmin(
+            email=email,
+            password=None,
+            prompt_mfa=None
+        )
     token_dir = os.path.expanduser("~/.garminconnect")
     client.login(token_dir)
     
@@ -500,8 +517,13 @@ def run_physiological_training_engine():
     }
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Garmin Connect Physiological Training Engine")
+    parser.add_argument("--interactive", action="store_true", help="Run interactively to prompt for credentials and MFA")
+    args = parser.parse_args()
+    
     try:
-        results = run_physiological_training_engine()
+        results = run_physiological_training_engine(interactive=args.interactive)
         print("Plan Sync Success:")
         for k, v in results.items():
             print(f"  {k}: {v}")

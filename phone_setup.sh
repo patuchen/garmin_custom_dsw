@@ -43,15 +43,46 @@ fi
 # 5. Initialize credentials secrets file if not present
 SECRETS_FILE="$HOME/.config/garmin/secrets.yaml"
 if [ ! -f "$SECRETS_FILE" ]; then
-    echo "5. Initializing secrets.yaml configuration..."
-    cat << 'EOF' > "$SECRETS_FILE"
-garmin_email: "your_email@example.com"
-garmin_password: "your_garmin_password_here"
+    echo "5. Configuring secrets.yaml..."
+    read -p "Would you like to configure your Garmin Connect credentials now? [y/N]: " configure_now
+    if [[ "$configure_now" =~ ^[Yy]$ ]]; then
+        read -p "Enter Garmin Connect Email: " garmin_email
+        read -p "Would you like to store your Garmin password in plain text in secrets.yaml? [y/N]: " store_password
+        
+        if [[ "$store_password" =~ ^[Yy]$ ]]; then
+            read -s -p "Enter Garmin Connect Password: " garmin_password
+            echo ""
+            cat << EOF > "$SECRETS_FILE"
+garmin_email: "$garmin_email"
+garmin_password: "$garmin_password"
 EOF
-    chmod 600 "$SECRETS_FILE"
-    echo "Secrets file initialized at: $SECRETS_FILE"
+        else
+            cat << EOF > "$SECRETS_FILE"
+garmin_email: "$garmin_email"
+garmin_password: ""
+EOF
+        fi
+        chmod 600 "$SECRETS_FILE"
+        echo "Secrets saved. Triggering first-time login to handle MFA authentication..."
+        echo "Please watch for the password and MFA prompts in this terminal!"
+        
+        if python3 "$HOME/scripts/training_engine.py" --interactive; then
+            echo "First-time interactive login successful! Tokens cached successfully."
+        else
+            echo "WARNING: First-time login failed (possibly due to invalid credentials or rate limits)."
+            echo "You can re-run the login manually using: python3 ~/scripts/training_engine.py --interactive"
+        fi
+    else
+        echo "Skipping interactive login. Writing placeholder secrets..."
+        cat << 'EOF' > "$SECRETS_FILE"
+garmin_email: "your_email@example.com"
+garmin_password: ""
+EOF
+        chmod 600 "$SECRETS_FILE"
+        echo "Placeholder secrets written to $SECRETS_FILE"
+    fi
 else
-    echo "5. Secrets file already exists. Skipping initialization."
+    echo "5. Secrets file already exists. Skipping configuration."
 fi
 
 # 6. Generate local SSL Certificate for secure HTTPS loopback
@@ -59,7 +90,6 @@ CERT_FILE="$HOME/scripts/cert.pem"
 KEY_FILE="$HOME/scripts/key.pem"
 if [ ! -f "$CERT_FILE" ] || [ ! -f "$KEY_FILE" ]; then
     echo "6. Generating self-signed SSL certificate for secure GCM HTTPS loopback..."
-    
     openssl req -x509 -newkey rsa:2048 -nodes -out "$CERT_FILE" -keyout "$KEY_FILE" -days 365 -subj "/CN=localhost"
     echo "SSL Certificate generated at $CERT_FILE"
 else

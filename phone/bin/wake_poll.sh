@@ -4,6 +4,7 @@ set -euo pipefail
 # Pathing and Environment setup
 export PATH="/data/data/com.termux/files/usr/bin:$PATH"
 LOCKFILE="$HOME/.garmin_daily_lock"
+LOGFILE="$HOME/.config/garmin/sync.log"
 TODAY=$(date "+%Y-%m-%d")
 HOUR=$(date "+%H")
 MIN=$(date "+%M")
@@ -55,8 +56,8 @@ try:
     config = load_config()
     client = Garmin(
         email=config['garmin_email'],
-        password=config['garmin_password'],
-        prompt_mfa=lambda: ''
+        password=None,
+        prompt_mfa=None
     )
     client.login(os.path.expanduser('~/.garminconnect'))
     
@@ -65,12 +66,20 @@ try:
     if sleep.get('dailySleepDTO', {}).get('sleepResultType') == 'FINAL':
         sys.exit(0)
 except Exception as e:
-    pass
+    # Log background check failures (such as expired session tokens)
+    with open(os.path.expanduser('$LOGFILE'), 'a') as f:
+        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        f.write(f'[{now}] Background sleep check failed: {str(e)}\n')
+        if 'auth' in str(e).lower() or 'login' in str(e).lower():
+            f.write(f'[{now}] TIP: Garmin session expired. Run: python3 ~/scripts/training_engine.py --interactive\\n')
 sys.exit(1)
 "; then
     # Run the physiological calculation and schedule today's workouts
-    python3 "$SCRIPTS_DIR/training_engine.py"
-    
-    # Write lockfile to prevent multiple triggers
-    echo "$TODAY" > "$LOCKFILE"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting dynamic workout planning calculation..." >> "$LOGFILE"
+    if python3 "$SCRIPTS_DIR/training_engine.py" >> "$LOGFILE" 2>&1; then
+        # Write lockfile to prevent multiple triggers
+        echo "$TODAY" > "$LOCKFILE"
+    else
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Training engine execution failed." >> "$LOGFILE"
+    fi
 fi
